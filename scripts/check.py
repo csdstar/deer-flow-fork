@@ -31,12 +31,17 @@ def run_command(command: list[str]) -> Optional[str]:
 
 def find_pnpm_command() -> Optional[list[str]]:
     """Return a pnpm-compatible command that exists on this machine."""
-    candidates = [["pnpm"], ["pnpm.cmd"]]
+    # On Windows, `pnpm` may resolve to an extensionless shim that works in an
+    # interactive shell but fails under subprocess(shell=False). Prefer
+    # `pnpm.cmd` when it is available and verify the candidate can actually run.
+    candidates = [["pnpm.cmd"], ["pnpm"]]
     if shutil.which("corepack"):
         candidates.append(["corepack", "pnpm"])
 
     for command in candidates:
-        if shutil.which(command[0]):
+        if not shutil.which(command[0]):
+            continue
+        if run_command([*command, "-v"]):
             return command
     return None
 
