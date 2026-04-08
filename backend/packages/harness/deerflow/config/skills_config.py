@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 
 def _default_repo_root() -> Path:
     """Resolve the repo root without relying on the current working directory."""
-    return Path(__file__).resolve().parents[5]
+    return Path(__file__).parents[5]
 
 
 class SkillsConfig(BaseModel):
