@@ -1,0 +1,1 @@
+.\scripts\run-with-git-bash.cmd .\scripts\serve.sh --dev
