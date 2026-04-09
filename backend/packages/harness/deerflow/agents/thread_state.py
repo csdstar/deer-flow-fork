@@ -44,7 +44,9 @@ def merge_viewed_images(existing: dict[str, ViewedImageData] | None, new: dict[s
     # Merge dictionaries, new values override existing ones for same keys
     return {**existing, **new}
 
-
+# 继承自AgentState，增加了线程相关的状态字段，
+# 是agent执行过程中维护的状态信息集合，
+# 支持中间件在不同阶段更新和访问这些状态信息。
 class ThreadState(AgentState):
     sandbox: NotRequired[SandboxState | None]
     thread_data: NotRequired[ThreadDataState | None]

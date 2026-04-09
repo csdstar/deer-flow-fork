@@ -71,7 +71,12 @@ def _build_runtime_middlewares(
     include_dangling_tool_call_patch: bool,
     lazy_init: bool = True,
 ) -> list[AgentMiddleware]:
-    """Build shared base middlewares for agent execution."""
+    """构建 Agent 执行时共享的基础中间件链。
+
+    这里放的是“线程运行时基础设施”相关中间件，而不是 lead agent 专属的
+    业务策略中间件。因此 ThreadData / Sandbox / Uploads 会在这里统一装配，
+    上层的 `agent.py` 和 SDK 风格的 `factory.py` 都直接复用这条基础链。
+    """
     from deerflow.agents.middlewares.llm_error_handling_middleware import LLMErrorHandlingMiddleware
     from deerflow.agents.middlewares.thread_data_middleware import ThreadDataMiddleware
     from deerflow.sandbox.middleware import SandboxMiddleware
@@ -93,7 +98,7 @@ def _build_runtime_middlewares(
 
     middlewares.append(LLMErrorHandlingMiddleware())
 
-    # Guardrail middleware (if configured)
+    # Guardrail 中间件（若配置启用）
     from deerflow.config.guardrails_config import get_guardrails_config
 
     guardrails_config = get_guardrails_config()

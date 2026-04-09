@@ -195,16 +195,16 @@ Being proactive with task management demonstrates thoroughness and ensures all r
     return TodoMiddleware(system_prompt=system_prompt, tool_description=tool_description)
 
 
-# ThreadDataMiddleware must be before SandboxMiddleware to ensure thread_id is available
-# UploadsMiddleware should be after ThreadDataMiddleware to access thread_id
-# DanglingToolCallMiddleware patches missing ToolMessages before model sees the history
-# SummarizationMiddleware should be early to reduce context before other processing
-# TodoListMiddleware should be before ClarificationMiddleware to allow todo management
-# TitleMiddleware generates title after first exchange
-# MemoryMiddleware queues conversation for memory update (after TitleMiddleware)
-# ViewImageMiddleware should be before ClarificationMiddleware to inject image details before LLM
-# ToolErrorHandlingMiddleware should be before ClarificationMiddleware to convert tool exceptions to ToolMessages
-# ClarificationMiddleware should be last to intercept clarification requests after model calls
+# ThreadDataMiddleware 必须先于 SandboxMiddleware，这样后者才能拿到当前线程的目录信息。
+# UploadsMiddleware 依赖 thread_id 和线程目录，所以要放在 ThreadDataMiddleware 之后。
+# DanglingToolCallMiddleware 会在模型读到历史前修补缺失的 ToolMessage。
+# SummarizationMiddleware 要尽量前置，先压缩上下文，再交给后续中间件处理。
+# TodoListMiddleware 要早于 ClarificationMiddleware，避免 todo 管理被澄清流程截断。
+# TitleMiddleware 在首轮完整往返后生成线程标题。
+# MemoryMiddleware 在 TitleMiddleware 之后，把对话送入长期记忆更新队列。
+# ViewImageMiddleware 要在 ClarificationMiddleware 之前，把图片内容注入给模型。
+# ToolErrorHandlingMiddleware 要在 ClarificationMiddleware 之前，把工具异常转换成 ToolMessage。
+# ClarificationMiddleware 必须放在最后，专门拦截 ask_clarification 并中断执行。
 def _build_middlewares(config: RunnableConfig, model_name: str | None, agent_name: str | None = None, custom_middlewares: list[AgentMiddleware] | None = None):
     """Build middleware chain based on runtime configuration.
     根据当前提供的runtime参数构建中间件链，支持动态启用/配置不同的中间件组件。
@@ -219,6 +219,9 @@ def _build_middlewares(config: RunnableConfig, model_name: str | None, agent_nam
     Returns:
         List of middleware instances.
     """
+    # 先拿到 lead agent 与 subagent 共用的“基础运行时链”。
+    # ThreadData / Uploads / Sandbox 都属于线程与执行环境基础设施，
+    # 因此不在这里逐个手写，而是统一从共享 builder 中取回。
     middlewares = build_lead_runtime_middlewares(lazy_init=True)
 
     # Add summarization middleware if enabled

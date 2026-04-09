@@ -159,6 +159,8 @@ def _assemble_from_features(
     plan_mode: bool = False,
     extra_middleware: list[AgentMiddleware] | None = None,
 ) -> tuple[list[AgentMiddleware], list[BaseTool]]:
+    # 这个工厂是 SDK 入口，它会在“纯参数模式”下拼出一条默认中间件链。
+    # 目标不是发明一套新顺序，而是尽量对齐 `make_lead_agent` 的默认行为。
     """Build an ordered middleware chain + extra tools from *feat*.
 
     Middleware order matches ``make_lead_agent`` (14 middlewares):
@@ -190,6 +192,9 @@ def _assemble_from_features(
     extra_tools: list[BaseTool] = []
 
     # --- [0-2] Sandbox infrastructure ---
+    # 这里先挂线程/沙箱基础设施层。
+    # ThreadDataMiddleware 会先把当前 thread 的 workspace / uploads / outputs
+    # 写入 state，后续 UploadsMiddleware、SandboxMiddleware 和若干工具都会依赖它。
     if feat.sandbox is not False:
         if isinstance(feat.sandbox, AgentMiddleware):
             chain.append(feat.sandbox)
