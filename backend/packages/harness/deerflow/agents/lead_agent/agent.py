@@ -207,11 +207,14 @@ Being proactive with task management demonstrates thoroughness and ensures all r
 # ClarificationMiddleware should be last to intercept clarification requests after model calls
 def _build_middlewares(config: RunnableConfig, model_name: str | None, agent_name: str | None = None, custom_middlewares: list[AgentMiddleware] | None = None):
     """Build middleware chain based on runtime configuration.
+    根据当前提供的runtime参数构建中间件链，支持动态启用/配置不同的中间件组件。
 
     Args:
         config: Runtime configuration containing configurable options like is_plan_mode.
         agent_name: If provided, MemoryMiddleware will use per-agent memory storage.
         custom_middlewares: Optional list of custom middlewares to inject into the chain.
+        
+        支持插入自定义middleware
 
     Returns:
         List of middleware instances.

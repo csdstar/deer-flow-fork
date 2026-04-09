@@ -51,6 +51,8 @@ class TodoMiddleware(TodoListMiddleware):
     history (e.g., after summarization), the model loses awareness of the current
     todo list. This middleware detects that gap in `before_model` / `abefore_model`
     and injects a reminder message so the model can continue tracking progress.
+    检查当前的状态上下文，如果state里有但message里没了，证明可能在压缩消息等过程中丢失了上下文，
+    这时候注入一个提醒消息，告诉模型当前的todo list还在，但之前的write_todos调用已经不在上下文里了。
     """
 
     @override

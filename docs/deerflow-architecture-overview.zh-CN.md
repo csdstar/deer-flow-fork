@@ -1,9 +1,5 @@
 # DeerFlow 架构总览（中文）
 
-> 本文聚焦 DeerFlow 的系统定位、运行结构、核心子系统和请求流转。  
-> 如果你更关心如何二次开发、如何把它改造成更像本地开发助手的形态，请继续看 [deerflow-secondary-development-guide.zh-CN.md](./deerflow-secondary-development-guide.zh-CN.md)。  
-> 完整版总说明仍保留在 [deerflow-repository-manual.zh-CN.md](./deerflow-repository-manual.zh-CN.md)。
-
 ## 1. DeerFlow 是什么
 
 DeerFlow 2.0 在官方 README 中被定义为一个开源的 **super agent harness**，核心目标不是只让模型回答问题，而是编排 **sub-agents、memory、sandboxes**，并通过 **extensible skills** 扩展能力。来源：[README](../README.md)
@@ -67,9 +63,9 @@ Nginx 是统一入口，负责把：
 
 Gateway 模式是实验性模式。此时不再单独运行 LangGraph Server，而是把 agent runtime 嵌入 Gateway，由运行时组件管理执行和流式输出。来源：[README](../README.md)、[backend/CLAUDE.md](../backend/CLAUDE.md)
 
-### 3.3 前端入口为什么会看到官网
+### 3.3 前端入口
 
-DeerFlow 的前端不是“根路径直接进入聊天区”的单页应用，而是：
+DeerFlow 的前端不是“是：
 
 - `frontend/src/app/page.tsx`：Landing Page
 - `frontend/src/app/workspace/page.tsx`：工作区入口
